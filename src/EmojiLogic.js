@@ -1,15 +1,15 @@
-import React, { useEffect } from "react";
-import { Draggable, Droppable } from "react-beautiful-dnd";
+import React from "react";
+import Draggable from "react-draggable";
 
 function EmojiLogic({ hearts, setHearts }) {
   const emojiOptions = ["🤍", "💛", "🧡", "❤️", "💜", "💙", "💚", "🤎", "🖤"];
 
   const cycleHeart = (index) => {
     const updatedHearts = [...hearts];
-    updatedHearts[index].currentIndex =
-      (updatedHearts[index].currentIndex + 1) % emojiOptions.length;
     updatedHearts[index].emoji =
-      emojiOptions[updatedHearts[index].currentIndex];
+      emojiOptions[
+        (emojiOptions.indexOf(hearts[index].emoji) + 1) % emojiOptions.length
+      ];
     setHearts(updatedHearts);
   };
 
@@ -34,63 +34,40 @@ function EmojiLogic({ hearts, setHearts }) {
     }
   };
 
-  //to prevent default scrolling the page up and down
-
-  useEffect(() => {
-    const canvas = document.querySelector(".canvas");
-
-    const preventScroll = (e) => {
-      if (canvas && canvas.contains(e.target)) {
-        e.preventDefault();
-      }
-    };
-
-    document.addEventListener("wheel", preventScroll, { passive: false });
-
-    return () => {
-      document.removeEventListener("wheel", preventScroll);
-    };
-  }, []);
-
   return (
-    <Droppable droppableId="canvas">
-      {(provided) => (
-        <div
-          {...provided.droppableProps}
-          ref={provided.innerRef}
-          className="canvas"
+    <div className="canvas">
+      {hearts.map((heart, index) => (
+        <Draggable
+          key={heart.id}
+          axis="both"
+          handle=".handle"
+          defaultPosition={{ x: 0, y: 0 }}
+          grid={[1, 1]}
+          scale={1}
+          onStart={(e, data) => console.log("Drag started", data)}
+          onDrag={(e, data) => console.log("Dragging", data)}
+          onStop={(e, data) => console.log("Drag stopped", data)}
         >
-          {hearts.map((heart, index) => (
-            <Draggable key={index} draggableId={`heart-${index}`} index={index}>
-              {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.draggableProps}
-                  {...provided.dragHandleProps}
-                  className="heart"
-                  onClick={() => {
-                    cycleHeart(index);
-                  }}
-                  onDoubleClick={() => {
-                    deleteHeart(index);
-                  }}
-                  onWheel={(e) => {
-                    handleWheel(index, e);
-                  }}
-                  style={{
-                    fontSize: `${heart.fontSize}px`,
-                    cursor: "grab",
-                  }}
-                >
-                  {heart.emoji}
-                </div>
-              )}
-            </Draggable>
-          ))}
-          {provided.placeholder}
-        </div>
-      )}
-    </Droppable>
+          <div className="handle">
+            {" "}
+            {/* This is the handle element */}
+            <div
+              key={index}
+              className="heart"
+              onClick={() => cycleHeart(index)}
+              onDoubleClick={() => deleteHeart(index)}
+              onWheel={(e) => handleWheel(index, e)}
+              style={{
+                fontSize: `${heart.fontSize}px`,
+              }}
+            >
+              {heart.emoji}
+            </div>
+            ;
+          </div>
+        </Draggable>
+      ))}
+    </div>
   );
 }
 

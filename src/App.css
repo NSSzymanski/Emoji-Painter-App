@@ -72,12 +72,11 @@ button {
   text-align: center;
   line-height: 50px;
   position: absolute;
-  cursor: grab;
+  cursor: -webkit-grab;
   user-select: none;
   color: #fff;
 }
 
-.heart-draggable {
-  cursor: grab;
-  user-select: none;
+div.heart:active {
+  cursor: -webkit-grabbing;
 }
